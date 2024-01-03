@@ -6,7 +6,9 @@
 // At the end of processing the whole file, print the list of unique numbers from the
 // global list.
 
-    
+
+//Solution
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
