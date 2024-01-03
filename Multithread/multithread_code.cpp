@@ -1,3 +1,12 @@
+// 2. Write a multi-threaded application to process a really large file which has integer
+// numbers stored in it. Each thread should work on a separate section of the file and
+// should find out unique numbers from that section and add it to the global unique
+// number list. Each thread keeps adding the unique numbers from its section to the
+// global list. Make sure the unique number should not repeat in the global list.
+// At the end of processing the whole file, print the list of unique numbers from the
+// global list.
+
+    
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -25,7 +34,7 @@ void* processNumbers(void* arg) {
         int number = numbers[i];
         int isUnique = 1;
 
-        // Check if the number is already in the local unique list
+        // Checking if the number is already in the local unique list
         for (j = 0; j < uniqueCount; j++) {
             if (uniqueNumbers[j] == number) {
                 isUnique = 0;
@@ -33,7 +42,7 @@ void* processNumbers(void* arg) {
             }
         }
 
-        // If not found, add it to the local unique list and the global unique list
+        // If not found, adding it to the local unique list and the global unique list
         if (isUnique) {
             if (pthread_mutex_lock(&mutex) != 0) {
                 perror("Error locking mutex");
@@ -53,20 +62,19 @@ void* processNumbers(void* arg) {
 }
 
 int main() {
-    // Open the file for reading
+    
     FILE* file = fopen("integers_list.txt", "r");
     if (file == NULL) {
         printf("Error opening file %s",file);
         return EXIT_FAILURE;
     }
 
-    // Read the file and populate the numbers array
+    
     int i = 0;
     while (fscanf(file, "%d", &numbers[i]) == 1 && i < MAX_NUMBERS) {
         i++;
     }
 
-    // Check if the file reading loop terminated due to an error
     if (ferror(file)) {
         printf("Error reading from file %s", file);
         fclose(file);
@@ -83,7 +91,7 @@ int main() {
     // Create thread arguments
     ThreadArgs threadArgs[MAX_THREADS];
 
-    // Create threads
+  
     for (i = 0; i < MAX_THREADS; i++) {
         threadArgs[i].start = i * sectionSize;
         threadArgs[i].end = (i == MAX_THREADS - 1) ? fileSize : (i + 1) * sectionSize;
@@ -95,7 +103,7 @@ int main() {
         }
     }
 
-    // Wait for all threads to finish
+    // Waiting for all threads to finish
     for ( i = 0; i < MAX_THREADS; i++) {
         if (pthread_join(threads[i], NULL) != 0) {
             perror("Error joining thread");
@@ -104,13 +112,13 @@ int main() {
         }
     }
 
-    // Print the unique numbers
+    // Printing the unique numbers
     for (i = 0; i < uniqueCount; i++) {
         printf("Unique Numbers List\n");
         printf("%d\n", uniqueNumbers[i]);
     }
 
-    // Close file
+   
     if (fclose(file) != 0) {
         perror("Error closing file");
         return EXIT_FAILURE;
